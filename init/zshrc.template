@@ -1,0 +1,35 @@
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+export HISTFILESIZE=1000000000
+export HISTSIZE=1000000000
+
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
+alias rsyncf="rsync -art --info=progress2 "
+
+function cheat() {
+    curl cheat.sh/$1
+}
+
+alias ..="cd .."
+alias ...="cd ../.."
+
+[[ -f ~/Git/zsh-snap/znap.zsh ]] ||
+    git clone --depth 1 -- \
+        https://github.com/marlonrichert/zsh-snap.git ~/Git/zsh-snap
+
+source ~/Git/zsh-snap/znap.zsh
+znap source zsh-users/zsh-autosuggestions
+znap source zsh-users/zsh-syntax-highlighting
+
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+export PATH="$PATH:/root/.local/bin"
