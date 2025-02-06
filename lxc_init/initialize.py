@@ -1,10 +1,15 @@
-import logging
-import time
 from pathlib import Path
-
-import click
 import paramiko
 from scp import SCPClient
+import logging
+import time
+
+
+def run_figlet(ssh_client: paramiko.client.SSHClient, host_name_pretty: str):
+    ssh_client.exec_command("rm /etc/motd")
+    host_name_pretty = host_name_pretty.split("-")
+    for entry in host_name_pretty:
+        ssh_client.exec_command(f"figlet {entry} >> /etc/motd")
 
 
 def key_based_connect(ip: str):
@@ -62,36 +67,3 @@ def run_init(ssh_client: paramiko.client.SSHClient):
         # Get the exit status of the command
         exit_status = session.recv_exit_status()
         logging.info(f"\nCommand exited with status {exit_status}")
-
-
-def run_figlet(ssh_client: paramiko.client.SSHClient, host_name_pretty: str):
-    ssh_client.exec_command("rm /etc/motd")
-    host_name_pretty = host_name_pretty.split("-")
-    for entry in host_name_pretty:
-        ssh_client.exec_command(f"figlet {entry} >> /etc/motd")
-
-
-@click.command()
-@click.argument("ip", nargs=1, type=str)
-@click.argument("hostname_pretty", nargs=1, type=str)
-def main(ip, hostname_pretty):
-    logging.info(f"Initializing {ip}")
-
-    ssh_client = key_based_connect(ip=ip)
-    _ = ssh_client.exec_command("mkdir /root/watchtower")
-
-    scp_client = SCPClient(ssh_client.get_transport())
-    copy_init_files(scp_client=scp_client)
-
-    run_init(ssh_client=ssh_client)
-
-    run_figlet(ssh_client=ssh_client, host_name_pretty=hostname_pretty)
-
-    ssh_client.close()
-
-    logging.info("DONE")
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    main()

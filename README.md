@@ -10,5 +10,5 @@ It does `apt update` und `apt dist`, changes the timezone and locale to Berlin, 
 git clone https://github.com/simeonreusch/lxc_init
 cd lxc_init
 poetry install
-python3 initialize.py <ip> <hostname_pretty>
+poetry run initialize <ip> <hostname_pretty>
 ```
