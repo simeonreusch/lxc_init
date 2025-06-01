@@ -91,7 +91,7 @@ sudo systemctl restart ssh
 echo "Password authentication for SSH has been disabled successfully."
 
 echo "Setting timezone"
-timedatectl set-timezone Europe/Berlin
+timedatectl set-timezone Europe/Berlin  
 
 rm /root/first_steps.sh
 

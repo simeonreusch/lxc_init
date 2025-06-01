@@ -13,6 +13,8 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+alias p3="python3"
+
 alias rsyncf="rsync -art --info=progress2 "
 
 function cheat() {

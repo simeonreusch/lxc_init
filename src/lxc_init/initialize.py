@@ -13,7 +13,7 @@ def run_figlet(ssh_client: paramiko.client.SSHClient, host_name_pretty: str):
 
 
 def key_based_connect(ip: str):
-    key_infile = Path.home() / ".ssh/id_ed25519"
+    key_infile = Path.home() / ".ssh" / "id_ed25519"
     pkey = paramiko.Ed25519Key.from_private_key_file(str(key_infile))
     ssh_client = paramiko.SSHClient()
     policy = paramiko.AutoAddPolicy()
@@ -24,16 +24,18 @@ def key_based_connect(ip: str):
 
 
 def copy_init_files(scp_client: SCPClient):
-    dir_path = Path("./init")
+    dir_path = Path(__file__).parents[1] / "init"
     files = []
+
     for src in dir_path.rglob("*"):
         if not src.is_dir():
-            target = Path(str(src).replace("init", "/root"))
+            target = Path("/root") / src.relative_to(dir_path)
             files.append((src, target))
 
     for entry in files:
         scp_client.put(entry[0], entry[1])
 
+    print("Done copying files")
 
 def run_init(ssh_client: paramiko.client.SSHClient):
     session = ssh_client.get_transport().open_session()
