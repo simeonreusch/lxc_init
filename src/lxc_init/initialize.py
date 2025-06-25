@@ -1,8 +1,9 @@
-from pathlib import Path
-import paramiko
-from scp import SCPClient
 import logging
 import time
+from pathlib import Path
+
+import paramiko
+from scp import SCPClient
 
 
 def run_figlet(ssh_client: paramiko.client.SSHClient, host_name_pretty: str):
@@ -13,7 +14,11 @@ def run_figlet(ssh_client: paramiko.client.SSHClient, host_name_pretty: str):
 
 
 def key_based_connect(ip: str):
-    key_infile = Path.home() / ".ssh" / "id_ed25519"
+    if "projekteure" in ip:
+        key_infile = Path.home() / ".ssh" / "id_ed25519_allerland"
+    else:
+        key_infile = Path.home() / ".ssh" / "id_ed25519"
+
     pkey = paramiko.Ed25519Key.from_private_key_file(str(key_infile))
     ssh_client = paramiko.SSHClient()
     policy = paramiko.AutoAddPolicy()
@@ -33,15 +38,23 @@ def copy_init_files(scp_client: SCPClient):
             files.append((src, target))
 
     for entry in files:
+        print(entry)
         scp_client.put(entry[0], entry[1])
 
     print("Done copying files")
 
+
 def run_init(ssh_client: paramiko.client.SSHClient):
+    run_script(ssh_client, "first_steps.sh")
+    # run_script(ssh_client, "rootless_docker.sh")
+
+
+def run_script(ssh_client: paramiko.client.SSHClient, script_name: str):
+    print(f"Running script {script_name}")
     session = ssh_client.get_transport().open_session()
     if session.active:
         # Execute the command
-        session.exec_command("(cd /root; ./first_steps.sh)")
+        session.exec_command(f"(cd /root; ./{script_name})")
 
         # Read the output in real-time
         while True:
