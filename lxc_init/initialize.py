@@ -29,7 +29,7 @@ def key_based_connect(ip: str):
 
 
 def copy_init_files(scp_client: SCPClient):
-    dir_path = Path(__file__).parents[1] / "init"
+    dir_path = Path(__file__).parents[1] / "templates" / "init"
     files = []
 
     for src in dir_path.rglob("*"):
@@ -44,17 +44,19 @@ def copy_init_files(scp_client: SCPClient):
     print("Done copying files")
 
 
-def run_init(ssh_client: paramiko.client.SSHClient):
-    run_script(ssh_client, "first_steps.sh")
+def run_init(ssh_client: paramiko.client.SSHClient, nodocker: bool = False):
+    run_script(ssh_client, "first_steps.sh", nodocker=nodocker)
     # run_script(ssh_client, "rootless_docker.sh")
 
 
-def run_script(ssh_client: paramiko.client.SSHClient, script_name: str):
+def run_script(ssh_client: paramiko.client.SSHClient, script_name: str, nodocker: bool = False):
     print(f"Running script {script_name}")
     session = ssh_client.get_transport().open_session()
     if session.active:
-        # Execute the command
-        session.exec_command(f"(cd /root; ./{script_name})")
+        # Execute the command with optional environment variable
+        env_var = "SKIP_DOCKER=1" if nodocker else ""
+        cmd = f"(cd /root; {env_var} ./{script_name})" if env_var else f"(cd /root; ./{script_name})"
+        session.exec_command(cmd)
 
         # Read the output in real-time
         while True:

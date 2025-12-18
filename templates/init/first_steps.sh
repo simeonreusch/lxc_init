@@ -37,25 +37,29 @@ echo "Installing borgbackup, pipx and borgmatic"
 apt install -y borgbackup pipx
 pipx install borgmatic
 
-echo "Installing Docker"
-apt update
-apt install ca-certificates curl dbus-user-session -y
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
+if [ -z "$SKIP_DOCKER" ]; then
+    echo "Installing Docker"
+    apt update
+    apt install ca-certificates curl dbus-user-session -y
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    chmod a+r /etc/apt/keyrings/docker.asc
 
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt update
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt update
 
-apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-echo "Creating watchtower container"
-cd /root/watchtower
-docker compose up -d
-cd /root
+    echo "Creating watchtower container"
+    cd /root/watchtower
+    docker compose up -d
+    cd /root
+else
+    echo "Skipping Docker installation (SKIP_DOCKER is set)"
+fi
 
 echo "Enabling ufw..."
 apt install -y ufw

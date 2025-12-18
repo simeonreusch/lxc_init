@@ -7,12 +7,22 @@ authors = [
 ]
 license = "BSD-3-Clause"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dependencies = [
     "click>=8.1.8",
     "paramiko>=3.5.1",
     "scp>=0.15.0"
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lxc_init"]
+exclude = []
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
 
 [project.scripts]
 initialize = "main:main"
